@@ -54,7 +54,7 @@ export const updateUserProfile = async ({ token, userData }) => {
                 Authorization: `Bearer ${token}`
             }
         }
-        const { data } = await axios.put(`http://localhost:5000/api/user/update-profile`, userData, config);
+        const { data } = await axios.put(`${baseUrl}user/update-profile`, userData, config);
         return data;
     } catch (error) {
         if (error.response && error.response.data.message)
@@ -71,7 +71,7 @@ export const updateProfilePicture = async ({ token, formData }) => {
                 Authorization: `Bearer ${token}`
             }
         }
-        const { data } = await axios.put(`http://localhost:5000/user/update-profile-picture`,
+        const { data } = await axios.put(`${baseUrl}user/update-profile-picture`,
             formData,
             config
         );

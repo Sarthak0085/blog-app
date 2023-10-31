@@ -130,12 +130,13 @@ const updateProfilePicture = async (req, res, next) => {
     upload(req, res, async function (err) {
       if (err) {
         const error = new Error(
-          "An Unknown error occured hile uploading" + err.message
+          "An unknown error occured when uploading " + err.message
         );
+        next(error);
       } else {
-        // if everything went well
+        // every thing went well
         if (req.file) {
-           let filename;
+          let filename;
           let updatedUser = await User.findById(req.user._id);
           filename = updatedUser.avatar;
           if (filename) {
@@ -143,27 +144,30 @@ const updateProfilePicture = async (req, res, next) => {
           }
           updatedUser.avatar = req.file.filename;
           await updatedUser.save();
-          res.status(201).json({
-            _id: updatedUser?._id,
-            avatar: updatedUser?.avatar,
-            name: updatedUser?.name,
-            email: updatedUser?.email,
-            verified: updatedUser?.verified,
-            admin: updatedUser?.admin,
+          res.json({
+            _id: updatedUser._id,
+            avatar: updatedUser.avatar,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            verified: updatedUser.verified,
+            admin: updatedUser.admin,
+            token: await updatedUser.generateJWT(),
           });
         } else {
           let filename;
-          const updatedUser = await User.findById(req.user._id);
+          let updatedUser = await User.findById(req.user._id);
           filename = updatedUser.avatar;
           updatedUser.avatar = "";
+          await updatedUser.save();
           fileRemover(filename);
-          res.status(201).json({
-            _id: updatedUser?._id,
-            avatar: updatedUser?.avatar,
-            name: updatedUser?.name,
-            email: updatedUser?.email,
-            verified: updatedUser?.verified,
-            admin: updatedUser?.admin,
+          res.json({
+            _id: updatedUser._id,
+            avatar: updatedUser.avatar,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            verified: updatedUser.verified,
+            admin: updatedUser.admin,
+            token: await updatedUser.generateJWT(),
           });
         }
       }

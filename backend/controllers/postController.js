@@ -82,7 +82,7 @@ const updatePost = async (req, res, next) => {
 // delete post
 const deletePost = async (req, res, next) => {
     try {
-        const post = await Post.findByIdAndDelete({ slug: req.params.slug });
+        const post = await Post.findOneAndDelete({ slug: req.params.slug });
 
         if (!post) {
             const error = new Error("Post not found");
@@ -172,7 +172,7 @@ const getAllPosts = async (req, res, next) => {
       return res.json([]);
     }
 
-    const result = await query
+    const data = await query
       .skip(skip)
       .limit(pageSize)
       .populate([
@@ -183,7 +183,7 @@ const getAllPosts = async (req, res, next) => {
       ])
       .sort({ updatedAt: "desc" });
 
-    return res.json(result);
+    return res.json({ data, totalPostCount:total, currentPage: page, pageSize: pageSize, totalPages:pages});
   } catch (error) {
     next(error);
   }
