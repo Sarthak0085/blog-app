@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AiFillDashboard, AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { FaComments } from "react-icons/fa";
+import { useWindowSize } from "@uidotdev/usehooks"
 import { MdDashboard, MdDeviceUnknown } from "react-icons/md"
 import { Link } from "react-router-dom"
 import NavItem from "./NavItem";
@@ -24,8 +25,8 @@ const MENU_ITEMS = [
     {
         title: "Posts",
         content: [
-            { title: "New", link: "/admin/posts/new" },
-            { title: "Manage", link: "/admin/posts/manage" },
+            { title: "Add New Post", link: "/admin/posts/new" },
+            { title: "Manage All Posts", link: "/admin/posts/manage" },
         ],
         icon: (<MdDashboard className="text-xl" />),
         name: "posts",
@@ -36,21 +37,22 @@ const MENU_ITEMS = [
 const Header = () => {
     const [isMenuActive, setIsMenuActive] = useState(false);
     const [activeNavName, setActiveNavName] = useState("dashboard");
+    const windowSize = useWindowSize();
 
     const handlerToggleMenu = () => {
         setIsMenuActive((prevState) => !prevState);
     }
 
-    // useEffect(() => {
-    //     if (windowSize.width < 1024) {
-    //         setIsMenuActive(false);
-    //     } else {
-    //         setIsMenuActive(true);
-    //     }
-    // }, [windowSize.width]);
+    useEffect(() => {
+        if (windowSize.width < 1024) {
+            setIsMenuActive(false);
+        } else {
+            setIsMenuActive(true);
+        }
+    }, [windowSize.width]);
 
     return (
-        <header className={`flex h-fit w-full items-center justify-between p-4 lg:h-full lg:max-w-[300px] 
+        <header className={`flex h-fit w-full z-[1000] items-center justify-between p-4 lg:h-full lg:max-w-[300px] 
         lg:flex-col lg:items-start lg:justify-start`}>
             {/* logo  */}
             <Link to="/">
@@ -60,8 +62,8 @@ const Header = () => {
             <div>
                 {
                     isMenuActive ?
-                        (<AiOutlineClose className="w-6 h-6" onClick={handlerToggleMenu} />) :
-                        (<AiOutlineMenu className="w-6 h-6" onClick={handlerToggleMenu} />)}
+                        (<AiOutlineClose className="w-6 h-6 lg:hidden" onClick={handlerToggleMenu} />) :
+                        (<AiOutlineMenu className="w-6 h-6 lg:hidden" onClick={handlerToggleMenu} />)}
             </div>
             {isMenuActive && (
                 <div className="fixed inset-0 lg:static lg:h-full lg:w-full">
@@ -69,7 +71,7 @@ const Header = () => {
                     <div className="fixed inset-0 bg-black opacity-50 lg:hidden" onClick={handlerToggleMenu} />
                     {/* sidebar  */}
                     <div className="fixed top-0 bottom-0 left-0 z-50 overflow-y-auto md:w-1/2 w-3/4 bg-white p-4
-                         lg:static lg:h-full lg:w-full lg:p-6">
+                         lg:static lg:h-full lg:w-full">
                         <Link to="/">
                             <MdDeviceUnknown />
                         </Link>

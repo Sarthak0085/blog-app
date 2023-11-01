@@ -140,7 +140,7 @@ const EditPost = () => {
                                     <h1 className="text-xl font-medium font-roboto text-dark-hard mt-4 md:text-[26px]">
                                         {data?.title}
                                     </h1>
-                                    <div className='w-full'>
+                                    <div className='w-full mt-4'>
                                         {!isLoading && !isError &&
                                             <Editor
                                                 content={data?.body}
@@ -152,15 +152,11 @@ const EditPost = () => {
                                         }
                                     </div>
 
-                                    {/* </div>
-                                    {/* <div className="mt-4 prose prose-sm sm:prose-base">
-                                        {/* {data?.body} */}
-                                    {/* </div> */}
                                     <button
                                         disabled={isLoadingUpdatePostDetail}
                                         type="button"
                                         onClick={handleUpdatePost}
-                                        className="w-full bg-primary text-white font-semibold rounded-lg px-4 py-2 disabled:cursor-not-allowed disabled:opacity-70"
+                                        className="w-full mt-5 bg-primary text-white font-semibold rounded-lg px-4 py-2 disabled:cursor-not-allowed disabled:opacity-70"
                                     >
                                         Update Post
                                     </button>

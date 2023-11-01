@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../store/actions/user";
 import images from "../constants/images";
+import { stables } from "../constants";
 
 const navItemsInfo = [
     { name: "Home", type: "link", href: "/" },
@@ -110,18 +111,23 @@ const Header = () => {
                         ))}
                     </ul>
                     {userState.userInfo ? (
-                        <div className="text-white items-center gap-y-5 mt-6 lg:text-dark-soft flex flex-col lg:flex-row gap-x-2 font-semibold">
+                        <div className="text-white items-center gap-y-5 mt-6 lg:mt-0 md:mt-0 lg:text-dark-soft flex flex-col lg:flex-row gap-x-2 font-semibold">
                             <div className="relative group">
                                 <div className="flex flex-col items-center">
                                     <button
-                                        className={`w-auto h-auto lg:mt-0 border-2 border-blue-500 rounded-full transition-all duration-300`}
+                                        className={`md:mt-0 lg:mt-0 lg:-ml-2 mt-4 object-fit border border-blue-500 rounded-full transition-all duration-300`}
                                         onClick={() => setProfileDrowpdown(!profileDrowpdown)}
                                     >
-                                        <img src={images.PostProfileImage} alt="" className="p-0" />
+                                        <img src={
+                                            userState?.userInfo?.avatar
+                                                ? stables.UPLOAD_FOLDER_BASE_URL +
+                                                userState?.userInfo?.avatar
+                                                : images.PostProfileImage
+                                        } alt="user avatar" className=" object-cover rounded-full w-10 aspect-square" />
                                     </button>
                                     <div
                                         className={`${profileDrowpdown ? "block" : "hidden"
-                                            } lg:hidden transition-all duration-500 pt-4 lg:absolute lg:bottom-0 lg:right-0 lg:transform lg:translate-y-full lg:group-hover:block w-max`}
+                                            } lg:hidden transition-all z-[100] bg-gray-300 rounded-lg duration-500 mt-2 lg:absolute lg:bottom-0 lg:right-0 lg:transform lg:translate-y-full lg:group-hover:block w-max`}
                                     >
                                         <ul className="bg-dark-soft lg:bg-transparent text-center flex flex-col shadow-lg rounded-lg overflow-hidden">
                                             {userState?.userInfo?.admin &&

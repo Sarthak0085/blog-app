@@ -17,7 +17,7 @@ const SuggestedPosts = ({ className, header, posts = [], tags = [] }) => {
                     >
                         <img
                             className="aspect-square rounded-lg object-cover w-1/5"
-                            src={item.image ? stables.UPLOAD_FOLDER_BASE_URL + item.image : images.Post1Image}
+                            src={item?.photo ? stables.UPLOAD_FOLDER_BASE_URL + item?.photo : images.Post1Image}
                             alt={item.title}
                         />
                         <div className="text-sm font-roboto text-dark-hard font-medium">

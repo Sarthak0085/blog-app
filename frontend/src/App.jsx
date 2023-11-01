@@ -11,6 +11,7 @@ import NewPost from "./pages/admin/screens/posts/NewPost";
 import ManagePost from "./pages/admin/screens/posts/ManagePost";
 import Admin from "./pages/admin/screens/admin";
 import EditPost from "./pages/admin/screens/posts/EditPost";
+import ManageComments from "./pages/admin/screens/comments/ManageComments";
 
 function App() {
 
@@ -24,7 +25,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/admin" element={<AdminPanel />} >
           <Route index element={<Admin />} />
-          <Route path="comments" element={<Comments />} />
+          <Route path="comments" element={<ManageComments />} />
           <Route path="posts/new" element={<NewPost />} />
           <Route path="posts/manage" element={<ManagePost />} />
           <Route path="posts/manage/edit/:slug" element={<EditPost />} />

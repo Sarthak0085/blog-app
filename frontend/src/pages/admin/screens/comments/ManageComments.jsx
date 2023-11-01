@@ -5,39 +5,59 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Pagination from "../../../../components/Pagination";
 import toast from "react-hot-toast";
-import { AiFillDelete, AiFillEdit } from "react-icons/ai";
+import { AiFillCheckCircle, AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { useSelector } from "react-redux";
+import { deleteComment, getAllComments, updateComment, updateCommentByAdmin } from "../../../../services/CommentsServices";
 
 let firstTime = true
 
-const ManagePost = () => {
+const ManageComments = () => {
     const queryClient = useQueryClient();
     const userState = useSelector((state) => state.user);
     const [searchKeyword, setSearchKeyword] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [commentConfirmation, setCommentConfirmation] = useState(false);
 
     const {
-        data: postsData,
+        data: commentsData,
         isLoading,
         isFetching,
         refetch,
     } = useQuery({
-        queryFn: () => getAllPosts(searchKeyword, currentPage),
-        queryKey: ["posts"],
+        queryFn: () => getAllComments(),
+        queryKey: ["comments"],
     });
-    console.log(searchKeyword);
-    console.log(postsData);
+    // console.log(searchKeyword);
+    // console.log(commentsData);
 
-    const { mutate: mutateDeletePost, isLoading: isLoadingDeletePost } = useMutation({
-        mutationFn: ({ token, slug }) => {
-            return deletePost({
+    const { mutate: mutateDeleteComment, isLoading: isLoadingDeleteComment } = useMutation({
+        mutationFn: ({ token, commentId }) => {
+            return deleteComment({
                 token,
-                slug
+                commentId
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(["posts"]);
-            toast.success("Post deleted successfully");
+            queryClient.invalidateQueries(["comments"]);
+            toast.success("Comment deleted successfully");
+        },
+        onError: (error) => {
+            toast.error(error.message);
+            console.log(error);
+        },
+    });
+
+    const { mutate: mutateUpdateComment, isLoading: isLoadingUpdateComment } = useMutation({
+        mutationFn: ({ token, data, commentId }) => {
+            return updateCommentByAdmin({
+                token,
+                data,
+                commentId
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(["comments"]);
+            toast.success("Comment Confirmation updated");
         },
         onError: (error) => {
             toast.error(error.message);
@@ -54,7 +74,7 @@ const ManagePost = () => {
     }, [refetch, currentPage])
 
     const searchKeywordHandler = (e) => {
-        const { value } = e.target;
+        const value = e.target.value;
         setSearchKeyword(value);
     };
 
@@ -64,18 +84,30 @@ const ManagePost = () => {
         refetch();
     };
 
-    const deletePostHandler = ({ slug, token }) => {
-        mutateDeletePost({ slug, token })
+    const deleteCommentHandler = (commentId) => {
+        mutateDeleteComment({
+            token: userState?.userInfo?.token,
+            commentId
+        })
+    };
+
+
+    const handlerCheck = (comment, commentId) => {
+        setCommentConfirmation((prev) => !prev)
+        console.log(comment);
+        const updatedComment = { ...comment, check: !comment.check };
+        console.log(updatedComment);
+        mutateUpdateComment({ token: userState?.userInfo?.token, data: updatedComment, commentId });
     }
 
     return (
         <div>
-            <h1 className="text-2xl font-semibold">Manage Posts</h1>
+            <h1 className="text-2xl font-semibold">Manage Comments</h1>
 
             <div className="w-full px-4 mx-auto">
                 <div className="py-8">
                     <div className="flex flex-row justify-between w-full mb-1 sm:mb-0">
-                        <h2 className="text-2xl leading-tight">Posts</h2>
+                        <h2 className="text-2xl leading-tight">Comments</h2>
                         <div className="text-end flex flex-col lg:flex-row gap-x-4">
                             <input
                                 type="text"
@@ -126,7 +158,7 @@ const ManagePost = () => {
                                             scope="col"
                                             className="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200"
                                         >
-                                            Tags
+                                            Check
                                         </th>
                                         <th
                                             scope="col"
@@ -134,75 +166,73 @@ const ManagePost = () => {
                                         ></th>
                                     </tr>
                                 </thead>
-                                <tbody className="w-full bg-white border-b border-gray-200 ">
+                                <tbody className="w-full bg-white border-b border-gray-200">
                                     {isLoading || isFetching ? (
                                         <tr>
                                             <td colSpan={5} className="text-center py-10 w-full">
                                                 Loading...
                                             </td>
                                         </tr>
-                                    ) : postsData?.data?.data?.length === 0 ? (
+                                    ) : commentsData?.data?.data?.length === 0 ? (
                                         <tr>
                                             <td colSpan={5} className="text-center py-10 w-full">
-                                                No Posts Available
+                                                No Comments Available
                                             </td>
                                         </tr>
                                     )
                                         : (
-                                            postsData?.data?.data.map((post) => (
-                                                <tr key={post._id}>
+                                            commentsData?.data?.data?.map((comment) => (
+                                                <tr key={comment._id}>
                                                     <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
                                                         <div className="flex items-center">
                                                             <div className="flex-shrink-0">
                                                                 <Link href="/" className="relative block">
                                                                     <img
-                                                                        src={post?.photo ? stables.UPLOAD_FOLDER_BASE_URL + post?.photo : images.Post1Image}
+                                                                        src={comment?.post?.photo ? stables.UPLOAD_FOLDER_BASE_URL + comment?.post?.photo : images.Post1Image}
 
-                                                                        alt={post.title}
+                                                                        alt={comment?.post?.title}
                                                                         className="mx-auto object-cover rounded-lg w-10 aspect-square"
                                                                     />
                                                                 </Link>
                                                             </div>
                                                             <div className="ml-3">
                                                                 <p className="text-gray-900 whitespace-no-wrap">
-                                                                    {post.title}
+                                                                    {comment?.post?.title}
                                                                 </p>
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
                                                         <p className="text-gray-900 whitespace-no-wrap">
-                                                            {post?.categories?.length > 0
-                                                                ? (<p className="px-2 py-2 gap-x-2 bg-primary text-white rounded-lg shadow-xl">{post?.categories[0]}</p>)
-                                                                : (<p className="text-red-500 shadow-sm">Uncategorized</p>)}
+                                                            {comment?.desc}
                                                         </p>
                                                     </td>
-                                                    <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
+                                                    <td className="px-5 py-5 text-sm bg-white border-b border-gray-200 flex flex-wrap">
                                                         <div className="flex items-center">
                                                             <div className="flex-shrink-0">
                                                                 <Link href="/" className="relative block">
                                                                     <img
                                                                         src={
-                                                                            post?.user?.photo
+                                                                            comment?.user?.avatar
                                                                                 ? stables.UPLOAD_FOLDER_BASE_URL +
-                                                                                post?.user?.photo
+                                                                                comment?.user?.avatar
                                                                                 : images.PostProfileImage
                                                                         }
-                                                                        alt={post?.user?._id}
+                                                                        alt={comment?.user?._id}
                                                                         className="mx-auto object-cover rounded-lg w-10 aspect-square"
                                                                     />
                                                                 </Link>
                                                             </div>
                                                             <div className="ml-3">
                                                                 <p className="text-gray-900 whitespace-no-wrap">
-                                                                    {post?.user?.name}
+                                                                    {comment?.user?.name}
                                                                 </p>
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
                                                         <p className="text-gray-900 whitespace-no-wrap">
-                                                            {new Date(post.createdAt).toLocaleDateString(
+                                                            {new Date(comment?.createdAt).toLocaleDateString(
                                                                 "en-US",
                                                                 {
                                                                     day: "numeric",
@@ -212,29 +242,29 @@ const ManagePost = () => {
                                                             )}
                                                         </p>
                                                     </td>
-                                                    <td className="px-5 py-5 text-sm bg-white border-b flex-wrap border-gray-200">
-                                                        <div className="flex flex-wrap gap-y-2 gap-x-2">
-                                                            {post?.tags?.length > 0
-                                                                ? post?.tags?.map((tag, index) => (
-                                                                    <p key={index} className="px-2 py-2 gap-x-2 bg-primary text-white rounded-lg shadow-xl">
-                                                                        {tag}
-                                                                    </p>
-                                                                ))
-                                                                : (<p className="text-red-500 shadow-sm">No tags Available</p>)}
+                                                    <td className="px-5 py-5 text-sm bg-white border-b flex-wrap  border-gray-200">
+                                                        <div className="flex flex-wrap items-center justify-center">
+                                                            <button onClick={() => handlerCheck(comment, comment?._id)}>{comment?.check === true ? <AiFillCheckCircle className="text-green-500 shadow-2xl rounded-lg w-10" /> : <AiFillCheckCircle className="text-red-500 shadow-2xl rounded-lg w-10" />}</button>
                                                         </div>
                                                     </td>
+
                                                     <td className="flex flex-col lg:flex-row justify-center items-center text-sm">
                                                         <Link
-                                                            to={`/admin/posts/manage/edit/${post?.slug}`}
-                                                            className="text-yellow-300 mx-2 disabled:cursor-not-allowed disabled:opacity-70"
+                                                            to={`/admin/posts/manage/edit/${comment?.slug}`}
+                                                            className="text-yellow-300 disabled:cursor-not-allowed disabled:opacity-70"
                                                         >
                                                             <AiFillEdit className="w-5 h-5" />
+                                                            {console.log(comment?._id)}
                                                         </Link>
                                                         <button
-                                                            disabled={isLoadingDeletePost}
+                                                            disabled={isLoadingDeleteComment}
                                                             type="delete"
                                                             className="mx-2 text-red-500 disabled:cursor-not-allowed disabled:opacity-70"
-                                                            onClick={() => deletePostHandler({ slug: post?.slug, token: userState?.userInfo?.token })}
+                                                            onClick={() => {
+                                                                if (comment && comment?._id) {
+                                                                    deleteCommentHandler(comment?._id);
+                                                                }
+                                                            }}
                                                         >
                                                             <AiFillDelete className="w-5 h-5" />
                                                         </button>
@@ -250,7 +280,7 @@ const ManagePost = () => {
                                     <Pagination
                                         onPageChange={(page) => setCurrentPage(page)}
                                         currentPage={currentPage}
-                                        totalPageCount={postsData?.data?.totalPages}
+                                        totalPageCount={commentsData?.data?.totalPages}
                                     />
                                 )
                             }
@@ -259,7 +289,8 @@ const ManagePost = () => {
                 </div>
             </div>
         </div>
+
     )
 }
 
-export default ManagePost
+export default ManageComments;

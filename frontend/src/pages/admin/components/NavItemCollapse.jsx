@@ -30,13 +30,13 @@ const NavItemCollapse = ({
 
                 <MdKeyboardArrowDown />
             </button>
-            <div className={`${dropdown ? "block" : "hidden"} text-gray-500 font-base rounded-lg  flex flex-col w-[150px] items-center transition-all duration-500 ml-5 bg-gray-200 `}>
+            <div className={`${dropdown ? "block" : "hidden"} text-gray-500 font-base rounded-lg  flex flex-col w-auto items-center transition-all duration-500 ml-5 bg-gray-200 `}>
                 {content?.map((item) => (
                     <NavLink
                         key={item.title}
                         to={item.link}
-                        className=" hover:text-primary hover:font-bold px-4 py-2"
-                        onClick={setActiveNavName(name)}
+                        className={`${item.title === activeNavName ? "font-bold text-primary" : "text-gray-500 hover:text-primary hover:font-bold"} flex items-center gap-x-7} hover:text-primary hover:font-bold px-4 py-2`}
+                        onClick={() => setActiveNavName(item.title)}
                     >
                         {item.title}
                     </NavLink>

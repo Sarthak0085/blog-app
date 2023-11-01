@@ -13,6 +13,7 @@ import ArticleDetailSkeleton from "./components/ArticleDetailSkeleton"
 import ErrorMessage from "../../components/ErrorMessage"
 import { useSelector } from "react-redux"
 import parseJsonToHtml from "../../utils/parseJsonToHtml"
+import Editor from "../../components/editor/Editor"
 
 // const breadCrumbData = [
 //     { name: "Home", link: "/" },
@@ -100,8 +101,8 @@ const ArticleDetailPage = () => {
                                     <h1 className="text-xl font-medium font-roboto text-dark-hard mt-4 md:text-[26px]">
                                         {data?.title}
                                     </h1>
-                                    <div className="mt-4 prose prose-sm sm:prose-base">
-                                        {body}
+                                    <div>
+                                        <Editor content={data?.body} editable={false} />
                                     </div>
                                     <CommentsContainer
                                         comments={data?.comments}
